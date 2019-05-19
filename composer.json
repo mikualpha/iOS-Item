@@ -1,0 +1,14 @@
+{
+    "name": "mikualpha/ios-final-item",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "mikualpha",
+            "email": "mikualpha@vip.qq.com"
+        }
+    ],
+    "require": {
+        "lcobucci/jwt": "^3.2"
+    }
+}
