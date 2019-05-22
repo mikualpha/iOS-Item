@@ -115,6 +115,7 @@ function regist($username, $password)
 {
     $passwd = passwordHash($password);
     addUser($username, $passwd);
+    addUserInfo(getUserId($username), $username);
     return generateToken($username, $passwd);
 }
 

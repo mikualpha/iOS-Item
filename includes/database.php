@@ -45,6 +45,14 @@ function createTables()
         userid INTEGER NOT NULL,
         article VARCHAR(255) NOT NULL
     ) DEFAULT CHARSET = utf8');
+
+    //用户信息表
+    $mysql->query( 'CREATE TABLE IF NOT EXISTS userinfo (
+        id INTEGER PRIMARY KEY,
+        nickname VARCHAR(255) NOT NULL,
+        signment VARCHAR(255) DEFAULT \'\'
+    ) DEFAULT CHARSET = utf8');
+
     //ENGINE = InnoDB 
     if ($mysql->error) die($mysql->error);
     $mysql->close();
@@ -243,4 +251,45 @@ function getUserLikeCount($userId) {
     $mysql->close();
 
     return $count;
+}
+
+/**
+ * 获取用户信息（昵称，签名等）
+ * 
+ * @param int $userId 用户ID
+ * @return array 包含昵称($nickname)和签名($signment)的数组
+ */
+function getUserInfoById($userId) {
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("SELECT nickname, signment FROM userinfo WHERE id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $stmt->bind_result($nickname, $signment);
+    $stmt->fetch();
+
+    $stmt->close();
+    $mysql->close();
+
+    return array('nickname' => $nickname, 'signment' => $signment);
+}
+
+/**
+ * 添加/修改用户信息
+ * 
+ * @param int $userId 用户ID
+ * @param string $nickname 用户昵称
+ * @param string $signment 用户签名
+ * @return void
+ */
+function addUserInfo($userId, $nickname, $signment = "") {
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("REPLACE INTO userinfo (id, nickname, signment) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $userId, $nickname, $signment);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $stmt->close();
+    $mysql->close();
 }
