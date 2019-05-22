@@ -42,11 +42,11 @@ function returnJson($httpCode, $jsonObj = array())
     if (!array_key_exists($httpCode, STATUS_CODE)) {
         $httpCode = 500;
     }
-    $outputs = array();
-    $outputs['status'] = $httpCode;
-    $outputs['msg'] = STATUS_CODE[$httpCode];
-    if (count($jsonObj) > 0) $outputs['data'] = $jsonObj;
-    die(json_encode($outputs));
+    $status = array();
+    $status['status'] = $httpCode;
+    $status['msg'] = STATUS_CODE[$httpCode];
+    header('Content-type:application/json');
+    die(json_encode(array_merge($status, $jsonObj)));
 }
 
 /**

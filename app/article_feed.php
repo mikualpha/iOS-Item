@@ -8,13 +8,13 @@
  * @version 1.0
  */
 
-include('../includes/auth.php');
-include('../includes/functions.php');
+include ( '../includes/auth.php' );
+include ( '../includes/functions.php' );
 
 define('URL', 'https://i.snssdk.com/course/article_feed');
 
 $id = getUserId(verifyToken());
-if (!$id) returnJson(403);
+if (!$id) returnJson(401);
 
 $param = array();
 $param['uid'] = $id;
