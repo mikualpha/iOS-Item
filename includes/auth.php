@@ -13,7 +13,7 @@ use \Lcobucci\JWT\Signer\Hmac\Sha256;
 use \Lcobucci\JWT\Parser;
 
 include ( '../vendor/autoload.php' );
-include ( '../includes/database.php' );
+include_once ( '../includes/database.php' );
 include_once ( '../settings/settings.php' );
 
 /**

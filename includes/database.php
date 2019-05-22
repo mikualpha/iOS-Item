@@ -32,10 +32,18 @@ function initConnection()
 function createTables()
 {
     $mysql = initConnection();
+    //用户表
     $mysql->query('CREATE TABLE IF NOT EXISTS user (
         id INTEGER AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(32) UNIQUE NOT NULL,
         passwd VARCHAR(255) NOT NULL
+    ) DEFAULT CHARSET = utf8');
+
+    //点赞表
+    $mysql->query('CREATE TABLE IF NOT EXISTS liked (
+        id INTEGER AUTO_INCREMENT PRIMARY KEY,
+        userid INTEGER NOT NULL,
+        article VARCHAR(255) NOT NULL
     ) DEFAULT CHARSET = utf8');
     //ENGINE = InnoDB 
     if ($mysql->error) die($mysql->error);
@@ -114,7 +122,8 @@ function addUser($username, $passwd)
  * @param string $username 用户名
  * @return int|bool 成功时返回用户ID，失败时返回false
  */
-function getIdByUsername($username) {
+function getIdByUsername($username)
+{
     $mysql = initConnection();
     $stmt = $mysql->prepare("SELECT id FROM user WHERE username = ?");
     $stmt->bind_param("s", $username);
@@ -130,4 +139,108 @@ function getIdByUsername($username) {
     $mysql->close();
 
     return $id;
+}
+
+/**
+ * 根据文章ID返回点赞数量
+ * 
+ * @param string $articleId 文章ID
+ * @return int 点赞数量
+ */
+function getLikeCountByArticle($articleId)
+{
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("SELECT * FROM liked WHERE article = ?");
+    $stmt->bind_param("s", $articleId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $count = $stmt->num_rows;
+
+    $stmt->close();
+    $mysql->close();
+
+    return $count;
+}
+
+/**
+ * 检查该用户是否已点赞某文章
+ * 
+ * @param string $articleId 文章ID
+ * @param int $userId 用户ID
+ * @return bool 用户是否已点赞
+ */
+function isUserLiked($articleId, $userId)
+{
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("SELECT * FROM liked WHERE article = ? AND userid = ?");
+    $stmt->bind_param("si", $articleId, $userId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $count = $stmt->num_rows;
+
+    $stmt->close();
+    $mysql->close();
+
+    return ($count > 0);
+}
+
+/**
+ * 点赞某文章
+ * 
+ * @param string $articleId 文章ID
+ * @param int $userId 用户ID
+ * @return void
+ */
+function addLike($articleId, $userId)
+{
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("INSERT IGNORE INTO liked (userid, article) VALUES (?, ?)");
+    $stmt->bind_param("is", $userId, $articleId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $stmt->close();
+    $mysql->close();
+}
+
+/**
+ * 取消点赞某文章
+ * 
+ * @param string $articleId 文章ID
+ * @param int $userId 用户ID
+ * @return void
+ */
+function removeLike($articleId, $userId)
+{
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("DELETE IGNORE FROM liked WHERE userid = ? AND article = ?");
+    $stmt->bind_param("is", $userId, $articleId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $stmt->close();
+    $mysql->close();
+}
+
+/**
+ * 获取用户的点赞数量
+ * 
+ * @param int $userId 用户ID
+ * @return int 该用户的点赞总数
+ */
+function getUserLikeCount($userId) {
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("SELECT * FROM liked WHERE userid = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $count = $stmt->num_rows;
+
+    $stmt->close();
+    $mysql->close();
+
+    return $count;
 }
