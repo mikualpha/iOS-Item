@@ -12,7 +12,7 @@ use \Lcobucci\JWT\Builder;
 use \Lcobucci\JWT\Signer\Hmac\Sha256;
 use \Lcobucci\JWT\Parser;
 
-include ( '../vendor/autoload.php' );
+require ( '../vendor/autoload.php' );
 include_once ( '../includes/database.php' );
 include_once ( '../settings/settings.php' );
 
@@ -148,6 +148,7 @@ function getTokenCaptcha($passwd)
  * @return int|bool 成功时返回用户ID，失败时返回false
  */
 function getUserId($username) {
+    if ($username === false) return false;
     return (int)getIdByUsername($username);
 }
 

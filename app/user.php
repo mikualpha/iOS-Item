@@ -42,6 +42,6 @@ function modifyUserInfo()
 {
     global $userid;
     if (!isset($_POST['nickname']) || !isset($_POST['signment'])) returnJson(400);
-    addUserInfo($userid, $_POST['nickname'], $_POST['signment']);
+    editUserInfo($userid, $_POST['nickname'], $_POST['signment']);
     returnJson(200);
 }

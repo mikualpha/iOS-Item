@@ -47,10 +47,11 @@ function createTables()
     ) DEFAULT CHARSET = utf8');
 
     //用户信息表
-    $mysql->query( 'CREATE TABLE IF NOT EXISTS userinfo (
+    $mysql->query('CREATE TABLE IF NOT EXISTS userinfo (
         id INTEGER PRIMARY KEY,
         nickname VARCHAR(255) NOT NULL,
-        signment VARCHAR(255) DEFAULT \'\'
+        signment VARCHAR(255) DEFAULT \'\',
+        avatar VARCHAR(255) DEFAULT \'\'
     ) DEFAULT CHARSET = utf8');
 
     //ENGINE = InnoDB 
@@ -115,12 +116,20 @@ function findUser($user)
 function addUser($username, $passwd)
 {
     $mysql = initConnection();
+    //插入用户表
     $stmt = $mysql->prepare("INSERT IGNORE INTO user (username, passwd) VALUES (?, ?)");
     $stmt->bind_param("ss", $username, $passwd);
     $stmt->execute();
     $stmt->store_result();
-
     $stmt->close();
+
+    //插入用户信息表
+    $stmt = $mysql->prepare("INSERT IGNORE INTO userinfo (id, nickname) VALUES (?, ?)");
+    $stmt->bind_param("iss", $mysql->insert_id, $username);
+    $stmt->execute();
+    $stmt->store_result();
+    $stmt->close();
+
     $mysql->close();
 }
 
@@ -238,7 +247,8 @@ function removeLike($articleId, $userId)
  * @param int $userId 用户ID
  * @return int 该用户的点赞总数
  */
-function getUserLikeCount($userId) {
+function getUserLikeCount($userId)
+{
     $mysql = initConnection();
     $stmt = $mysql->prepare("SELECT * FROM liked WHERE userid = ?");
     $stmt->bind_param("i", $userId);
@@ -259,7 +269,8 @@ function getUserLikeCount($userId) {
  * @param int $userId 用户ID
  * @return array 包含昵称($nickname)和签名($signment)的数组
  */
-function getUserInfoById($userId) {
+function getUserInfoById($userId)
+{
     $mysql = initConnection();
     $stmt = $mysql->prepare("SELECT nickname, signment FROM userinfo WHERE id = ?");
     $stmt->bind_param("i", $userId);
@@ -276,17 +287,37 @@ function getUserInfoById($userId) {
 }
 
 /**
- * 添加/修改用户信息
+ * 修改用户信息
  * 
  * @param int $userId 用户ID
  * @param string $nickname 用户昵称
  * @param string $signment 用户签名
  * @return void
  */
-function addUserInfo($userId, $nickname, $signment = "") {
+function editUserInfo($userId, $nickname, $signment = "")
+{
     $mysql = initConnection();
-    $stmt = $mysql->prepare("REPLACE INTO userinfo (id, nickname, signment) VALUES (?, ?, ?)");
-    $stmt->bind_param("iss", $userId, $nickname, $signment);
+    $stmt = $mysql->prepare("UPDATE userinfo SET nickname = ?, signment = ? WHERE id = ?");
+    $stmt->bind_param("ssi", $nickname, $signment, $userId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $stmt->close();
+    $mysql->close();
+}
+
+/**
+ * 修改用户头像链接
+ * 
+ * @param int $userId 用户ID
+ * @param stirng $link 头像链接
+ * @return void
+ */
+function editUserAvatarLink($userId, $link = "")
+{
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("UPDATE userinfo SET link = ? WHERE id = ?");
+    $stmt->bind_param("si", $link, $userId);
     $stmt->execute();
     $stmt->store_result();
 
