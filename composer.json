@@ -9,6 +9,7 @@
         }
     ],
     "require": {
-        "lcobucci/jwt": "^3.2"
+        "lcobucci/jwt": "^3.2",
+        "aliyuncs/oss-sdk-php": "^2.3"
     }
 }

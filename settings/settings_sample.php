@@ -31,3 +31,15 @@ define('DB_PASS', 'example');
 
 //数据库-库名称
 define('DB_NAME', 'default');
+
+//OSS-AccessKeyId
+define('OSS_ACCESS_KEY_ID', '');
+
+//OSS-AccessKeySecret
+define('OSS_ACCESS_KEY_SECRET', '');
+
+//OSS-EndPoint
+define('OSS_ENDPOINT', '');
+
+//OSS-Bucket
+define('OSS_BUCKET_NAME', '');
