@@ -121,11 +121,12 @@ function addUser($username, $passwd)
     $stmt->bind_param("ss", $username, $passwd);
     $stmt->execute();
     $stmt->store_result();
+    $userid = $stmt->insert_id;
     $stmt->close();
 
     //插入用户信息表
     $stmt = $mysql->prepare("INSERT IGNORE INTO userinfo (id, nickname) VALUES (?, ?)");
-    $stmt->bind_param("iss", $mysql->insert_id, $username);
+    $stmt->bind_param("is", $userid, $username);
     $stmt->execute();
     $stmt->store_result();
     $stmt->close();
@@ -267,23 +268,23 @@ function getUserLikeCount($userId)
  * 获取用户信息（昵称，签名等）
  * 
  * @param int $userId 用户ID
- * @return array 包含昵称($nickname)和签名($signment)的数组
+ * @return array 包含昵称($nickname)、签名($signment)、头像链接($avatar)的数组
  */
 function getUserInfoById($userId)
 {
     $mysql = initConnection();
-    $stmt = $mysql->prepare("SELECT nickname, signment FROM userinfo WHERE id = ?");
+    $stmt = $mysql->prepare("SELECT nickname, signment, avatar FROM userinfo WHERE id = ?");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
     $stmt->store_result();
 
-    $stmt->bind_result($nickname, $signment);
+    $stmt->bind_result($nickname, $signment, $avatar);
     $stmt->fetch();
 
     $stmt->close();
     $mysql->close();
 
-    return array('nickname' => $nickname, 'signment' => $signment);
+    return array('nickname' => $nickname, 'signment' => $signment, 'avatar' => $avatar);
 }
 
 /**

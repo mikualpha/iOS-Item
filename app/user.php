@@ -29,10 +29,16 @@ switch ($_SERVER['REQUEST_METHOD']) {
 function getUserInfo()
 {
     global $userid;
+    //从数据库读取用户信息
+    $userInfo = getUserInfoById($userid);
+
+    //若头像为空，则设置为默认头像
+    if ($userInfo['avatar'] == '') $userInfo['avatar'] = 'https://secure.gravatar.com/avatar/';
+    
     returnJson(
         200,
         array_merge(
-            getUserInfoById($userid),
+            $userInfo,
             array('like_count' => getUserLikeCount($userid))
         )
     );
