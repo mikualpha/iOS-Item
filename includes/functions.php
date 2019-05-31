@@ -45,7 +45,7 @@ function returnJson($httpCode, $jsonObj = array())
     $outputs = array();
     $outputs['status'] = $httpCode;
     $outputs['msg'] = STATUS_CODE[$httpCode];
-    if (count($jsonObj) > 0) $outputs['data'] = $jsonObj;
+    if (count($jsonObj) > 0 || $jsonObj === null) $outputs['data'] = $jsonObj;
     die(json_encode($outputs));
 }
 

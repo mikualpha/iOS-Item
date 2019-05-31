@@ -50,8 +50,17 @@ function createTables()
     $mysql->query('CREATE TABLE IF NOT EXISTS userinfo (
         id INTEGER PRIMARY KEY,
         nickname VARCHAR(255) NOT NULL,
-        signment VARCHAR(255) DEFAULT \'\',
+        signment TEXT DEFAULT \'\',
         avatar VARCHAR(255) DEFAULT \'\'
+    ) DEFAULT CHARSET = utf8');
+
+    //评论表
+    $mysql->query('CREATE TABLE IF NOT EXISTS comment (
+        id INTEGER PRIMARY KEY AUTO_INCREMENT,
+        userid INTEGER NOT NULL,
+        article VARCHAR(255) NOT NULL,
+        content MEDIUMTEXT,
+        time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) DEFAULT CHARSET = utf8');
 
     //ENGINE = InnoDB 
@@ -321,6 +330,64 @@ function editUserAvatarLink($userId, $link = "")
     $stmt->bind_param("si", $link, $userId);
     $stmt->execute();
     $stmt->store_result();
+
+    $stmt->close();
+    $mysql->close();
+}
+
+/**
+ * 获取评论列表
+ * 
+ * @param string $groupId 文章ID
+ * @param string $time 时间差量
+ * @return array 以API文档为模板的数组类型
+ */
+function getArticleComment($groupId, $queryTime)
+{
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("SELECT id, userid, content, time FROM comment WHERE article = ? AND time >= ?");
+    $stmt->bind_param("si", $groupId, $queryTime);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $stmt->bind_result($id, $userid, $content, $time);
+    $result = array();
+    while ($stmt->fetch()) {
+        $user = getUserInfoById($userid);
+
+        $temp = array();
+        $temp['id'] = $id;
+        $temp['time'] = $time;
+        $temp['unix_time'] = strtotime($time);
+        $temp['author_id'] = $userid;
+        $temp['author'] = $user['nickname'];
+        $temp['avatar'] = $user['avatar'] != "" ? $user['avatar'] : DEFAULT_AVATAR;
+        $temp['description'] = $user['signment'];
+        $temp['content'] = $content;
+
+        $result[] = $temp;
+    }
+
+    $stmt->close();
+    $mysql->close();
+
+    return $result;
+}
+
+/**
+ * 添加评论
+ * 
+ * @param int $userId 用户ID
+ * @param string $groupId 文章ID
+ * @param string $content 评论内容
+ * @return void
+ */
+function putArticleComment($userId, $groupId, $content)
+{
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("INSERT IGNORE INTO comment (userid, article, content) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $userId, $groupId, $content);
+    $stmt->execute();
 
     $stmt->close();
     $mysql->close();
