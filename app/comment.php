@@ -7,9 +7,6 @@
  * @author  MikuAlpha
  * @version 1.0
  */
-ini_set("display_errors", 1);
-error_reporting(E_ALL);
-
 include_once('../includes/functions.php');
 include_once('../includes/auth.php');
 include_once('../includes/database.php');
