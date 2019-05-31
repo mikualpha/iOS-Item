@@ -43,3 +43,6 @@ define('OSS_ENDPOINT', '');
 
 //OSS-Bucket
 define('OSS_BUCKET_NAME', '');
+
+//默认头像地址
+define('DEFAULT_AVATAR', 'https://secure.gravatar.com/avatar/');

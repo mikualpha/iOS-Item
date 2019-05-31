@@ -10,6 +10,7 @@
 
 include('../includes/auth.php');
 include('../includes/functions.php');
+include_once('../settings/settings.php');
 include_once('../includes/database.php');
 
 $userid = getUserId(verifyToken());
@@ -33,7 +34,7 @@ function getUserInfo()
     $userInfo = getUserInfoById($userid);
 
     //若头像为空，则设置为默认头像
-    if ($userInfo['avatar'] == '') $userInfo['avatar'] = 'https://secure.gravatar.com/avatar/';
+    if ($userInfo['avatar'] == '') $userInfo['avatar'] = DEFAULT_AVATAR;
     
     returnJson(
         200,
