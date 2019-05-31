@@ -40,7 +40,10 @@ function getUserInfo()
         200,
         array_merge(
             $userInfo,
-            array('like_count' => getUserLikeCount($userid))
+            array(
+                'like_count' => getUserLikeCount($userid),
+                'comment_count' => getUserCommentCount($userid)
+            )
         )
     );
 }

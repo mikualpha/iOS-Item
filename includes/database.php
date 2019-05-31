@@ -392,3 +392,25 @@ function putArticleComment($userId, $groupId, $content)
     $stmt->close();
     $mysql->close();
 }
+
+/**
+ * 获取用户的评论数量
+ * 
+ * @param int $userId 用户ID
+ * @return int 该用户的评论总数
+ */
+function getUserCommentCount($userId)
+{
+    $mysql = initConnection();
+    $stmt = $mysql->prepare("SELECT * FROM comment WHERE userid = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    $count = $stmt->num_rows;
+
+    $stmt->close();
+    $mysql->close();
+
+    return $count;
+}
