@@ -33,7 +33,7 @@ function uploadImage($path = '', $filename = '') {
     if ($filename == '') $filename = generateFileName();
 
     $ossClient->uploadFile(OSS_BUCKET_NAME, $filename, $path);
-    return "https://" . OSS_BUCKET_NAME . "." .  OSS_ENDPOINT . "/" . $filename;
+    return "https://" . OSS_BUCKET_NAME . "." .  OSS_ENDPOINT . "/" . $filename . "?x-oss-process=style/thumbnail";
 }
 
 function generateFileName() {
