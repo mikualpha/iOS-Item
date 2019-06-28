@@ -10,6 +10,7 @@
 include('../includes/file_upload.php');
 include('../includes/functions.php');
 include('../includes/database.php');
+include('../includes/auth.php');
 
 $userid = getUserId(verifyToken());
 if (!$userid) returnJson(401);
